@@ -83,8 +83,7 @@ class MingdaoYun:
         auth_prams = {"appKey": self.appKey, "sign": self.sign, "worksheetId": self.worksheetId}
         if len(self.view) > 0:
             self.params["viewId"] = self.view
-        if len(self.filters) > 0:
-            self.params["filters"] = self.filters
+        self.params["filters"] = self.filters
         data = http.post(self.host + uri, json={**self.params, **auth_prams}).json()
         return data
 
