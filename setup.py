@@ -15,7 +15,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     # 包的分发名称，使用字母、数字、_、-
-    name="mingdaoyun-sdk",
+    name="mingdaoyun_sdk",
     # 版本号, 版本号规范：https://www.python.org/dev/peps/pep-0440/
     version="0.0.2",
     # 作者名
