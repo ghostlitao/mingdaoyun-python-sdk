@@ -29,7 +29,7 @@ setuptools.setup(
     # 和上条命令配合使用，声明加载的是markdown文件
     long_description_content_type="text/markdown",
     # 项目开源地址
-    url="https://dashen.tech",
+    url="https://github.com/ghostlitao/mingdaoyun-python-sdk",
     # 如果项目由多个文件组成，我们可以使用find_packages()自动发现所有包和子包，而不是手动列出每个包，在这种情况下，包列表将是example_pkg
     packages=setuptools.find_packages(),
     # 关于包的其他元数据(metadata)
