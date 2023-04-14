@@ -85,7 +85,6 @@ class MingdaoYun:
             self.params["view"] = self.view
         if len(self.filters) > 0:
             self.params["filters"] = self.filters
-        print(self.params)
         data = http.post(self.host + uri, json={**self.params, **auth_prams}).json()
         return data
 
