@@ -21,7 +21,7 @@ setuptools.setup(
     # 作者名
     author="Todd",
     # 作者邮箱
-    author_email="ghostlitao@ghostlitao@gmail.com",
+    author_email="ghostlitao@gmail.com",
     # 包的简介描述
     description="针对mingdaoyun的API封装的Python-SDK包",
     # 包的详细介绍(一般通过加载README.md)
