@@ -5,7 +5,7 @@
 @Version 1.0
 @Description 明道云API封装类
 """
-from common import http
+from mingdaoyun_sdk.common import http
 
 
 class MingdaoYun:

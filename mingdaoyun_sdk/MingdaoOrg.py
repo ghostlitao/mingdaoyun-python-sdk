@@ -9,7 +9,7 @@ import hashlib
 import base64
 import time
 
-from common import http
+from mingdaoyun_sdk.common import http
 
 
 class MingdaoOrg:
