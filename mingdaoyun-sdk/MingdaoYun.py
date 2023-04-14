@@ -1,0 +1,265 @@
+#!/usr/bin/env python
+# -*- encoding: utf-8 -*-
+"""
+@Author Todd
+@Version 1.0
+@Description 明道云API封装类
+"""
+from common import http
+
+
+class MingdaoYun:
+    appKey = ""
+    sign = ""
+    host = ""
+
+    worksheetId = ""
+    view = ""
+    filters = []
+
+    worksheetMap = {}
+    params = {}
+
+    # URIs
+    LIST_URL = "/api/v2/open/worksheet/getFilterRows"
+    WORKSHEET_MAP_URL = "/api/v2/open/worksheet/getWorksheetInfo"
+    GET_BY_ID_URL = "/api/v2/open/worksheet/getRowByIdPost"
+    GET_RELATIONS_URL = "/api/v2/open/worksheet/getRowRelations"
+    ADD_URL = "/api/v2/open/worksheet/addRow"
+    BATCH_ADD_URL = "/api/v2/open/worksheet/addRows"
+    DELETE_URL = "/api/v2/open/worksheet/deleteRow"
+    EDIT_URL = "/api/v2/open/worksheet/editRow"
+    BATCH_EDIT_URL = "/api/v2/open/worksheet/editRows"
+
+    def __init__(self, appKey: str, sign: str, host: str):
+        """
+        初始化mingdaoyun方法
+        :param appKey: {string} appKey
+        :param sign:{string} sign
+        :param host :{string} host
+        :return:  Mingdaoyun 实体类
+        """
+        self.appKey = appKey
+        self.sign = sign
+        self.host = host
+        self.params = {}
+        self.filters = []
+        self.worksheetId = ""
+        self.view = ""
+        return
+
+    def table(self, table: str):
+        """
+        设置当前的worksheet
+        :param table: 表名
+        :return: 自身
+        """
+        self.worksheetId = table
+        self.filters = []
+        if not self.worksheetMap.get(self.worksheetId):
+            data = self.exec(self.WORKSHEET_MAP_URL)
+            map = {}
+            for item in data["data"]["controls"]:
+                if "alias" in item and item["alias"]:
+                    map[item["alias"]] = item
+                else:
+                    map[item["controlId"]] = item
+            self.worksheetMap[self.worksheetId] = map
+
+        return self
+
+    def set_view(self, view: str):
+        """
+        设置当前的view
+        :param view: 表名
+        :return: 自身
+        """
+        self.view = view
+        return self
+
+    def exec(self, uri: str):
+        if not (self.appKey and self.sign and self.worksheetId):
+            raise Exception('appKey,sign,table is required! ')
+        auth_prams = {"appKey": self.appKey, "sign": self.sign, "worksheetId": self.worksheetId}
+        if len(self.view) > 0:
+            self.params["view"] = self.view
+        if len(self.filters) > 0:
+            self.params["filters"] = self.filters
+        print(self.params)
+        data = http.post(self.host + uri, json={**self.params, **auth_prams}).json()
+        return data
+
+    def get_field_data_type(self, field: str) -> str:
+        """
+        或者字段类型
+        :param field:
+        :return:
+        """
+        map = self.worksheetMap[self.worksheetId]
+        if field in map and map[field]:
+            return map[field]["type"]
+
+    def where(self, field: str, symbol: str, value='', values=[], minValue="", maxValue=""):
+        """
+        设置查询条件
+        :param field: 字段
+        :param symbol: 操作符，支持 contains , = , startWith, endWith , notContain , != ,is null(None), not null , > ,>=,  <, <=, RCEq , RCNe ,between , nBetween,DateEnum,NDateEnum,DateBetween,DateNBetween
+        :param value: 值
+        :param values: 数组类型的值
+        :param maxValue: 最大值
+        :param minValue: 最小值
+        :return: 自身
+        """
+
+        if symbol is None or symbol == "is null":
+            filter_type = 7
+        elif symbol == "not null":
+            filter_type = 8
+        elif symbol == "contains":
+            filter_type = 1
+        elif symbol == "=":
+            filter_type = 2
+        elif symbol == "startWith":
+            filter_type = 3
+        elif symbol == "endWith":
+            filter_type = 4
+        elif symbol == "notContain":
+            filter_type = 5
+        elif symbol == "!=":
+            filter_type = 6
+        elif symbol == "between":
+            filter_type = 11
+        elif symbol == "nBetween":
+            filter_type = 12
+        elif symbol == ">":
+            filter_type = 13
+        elif symbol == ">=":
+            filter_type = 14
+        elif symbol == "<":
+            filter_type = 15
+        elif symbol == "<=":
+            filter_type = 16
+        elif symbol == "DateEnum":
+            # 日期是
+            filter_type = 17
+        elif symbol == "NDateEnum":
+            # 日期不是
+            filter_type = 18
+        elif symbol == "DateBetween":
+            # 在范围内
+            filter_type = 31
+        elif symbol == "DateNBetween":
+            # 不在范围内
+            filter_type = 32
+        elif symbol == "DateGt":
+            filter_type = 33
+        elif symbol == "DateGte":
+            filter_type = 34
+        elif symbol == "DateLt":
+            filter_type = 35
+        elif symbol == "DateLte":
+            filter_type = 36
+        elif symbol == "RCEq":
+            # 关系相等
+            filter_type = 24
+        elif symbol == "RCNe":
+            # 关系不相等
+            filter_type = 25
+        else:
+            filter_type = symbol
+
+        _filter = {
+            'controlId': field,
+            'dataType': self.get_field_data_type(field),
+            'spliceType': 1,
+            'filterType': filter_type,
+        }
+        if symbol in ["DateBetween", "DateNBetween"]:
+            _filter["maxValue"] = maxValue
+            _filter["minValue"] = minValue
+        if len(values) > 0:
+            _filter["values"] = values
+        else:
+            _filter["value"] = value
+        self.filters.append(_filter)
+        return self
+
+    def find(self, rowid=None, pageSize=1000, pageIndex=1, all=False):
+        """
+        查询数据
+        :param rowid:
+        :param pageSize:
+        :param pageIndex:
+        :param all:
+        :return:
+        """
+        if rowid:
+            # 找单个
+            self.params["rowId"] = rowid
+            return self.exec(self.GET_BY_ID_URL)
+        else:
+            self.params["pageSize"] = pageSize
+            self.params["pageIndex"] = pageIndex
+            self.params["notGetTotal"] = 1  # 不要Total 提高性能
+            # 根据条件进行搜索
+            result = self.exec(self.LIST_URL)
+            if all:
+                # 获取全部
+                while True:
+                    self.params["pageIndex"] = self.params["pageIndex"] + 1
+                    current_result = self.exec(self.LIST_URL)
+                    if len(current_result["data"]["rows"]) > 0:
+                        result["data"]["rows"] = result["data"]["rows"] + current_result["data"]["rows"]
+                    else:
+                        break
+                result["data"]["total"] = len(result["data"]["rows"])
+                return result
+            else:
+                result["data"]["total"] = len(result["data"]["rows"])
+                return result
+
+    def add(self, data: list):
+        """
+        新增一条数据,data 格式为：
+        data = [{'controlId': $controlId,'value':$value},{'controlId': $controlId,'value':$value}]
+        :param data:
+        :return:
+        """
+        self.params["controls"] = data
+        return self.exec(self.ADD_URL)
+
+    def delete(self, data: str):
+        """
+        删除记录，rowid为逗号拼接的字符串
+        :param data:
+        :return:
+        """
+        self.params["rowId"] = data
+        return self.exec(self.DELETE_URL)
+
+    def find_relations(self, rowid, controlId, pageSize=1000, pageIndex=1, all=False):
+        """
+        查询数据
+        :param rowid: 本表rowid
+        :param controlId: 关联字段
+        :param pageSize: 页码
+        :param pageIndex:
+        :param all:
+        :return:
+        """
+        self.params["pageSize"] = pageSize
+        self.params["pageIndex"] = pageIndex
+        self.params["rowId"] = rowid
+        self.params["controlId"] = controlId
+        # 根据条件进行搜索
+        result = self.exec(self.GET_RELATIONS_URL)
+        if all:
+            # 获取全部
+            while len(result["data"]["rows"]) < result["data"]["total"]:
+                print(f'turn page {len(result["data"]["rows"])}/{result["data"]["total"]}')
+                self.params["pageIndex"] = self.params["pageIndex"] + 1
+                current_result = self.exec(self.GET_RELATIONS_URL)
+                result["data"]["rows"] = result["data"]["rows"] + current_result["data"]["rows"]
+            return result
+        else:
+            return result
