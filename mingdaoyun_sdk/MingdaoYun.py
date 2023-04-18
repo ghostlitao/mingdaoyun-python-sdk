@@ -31,7 +31,7 @@ class MingdaoYun:
     EDIT_URL = "/api/v2/open/worksheet/editRow"
     BATCH_EDIT_URL = "/api/v2/open/worksheet/editRows"
 
-    def __init__(self, appKey: str, sign: str, host: str):
+    def __init__(self, appKey: str, sign: str, host: str, cert_path: str = None):
         """
         初始化mingdaoyun方法
         :param appKey: {string} appKey
@@ -46,6 +46,8 @@ class MingdaoYun:
         self.filters = []
         self.worksheetId = ""
         self.view = ""
+        if cert_path is not None:
+            http.verify = cert_path
         return
 
     def table(self, table: str):
