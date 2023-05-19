@@ -50,14 +50,23 @@ class MingdaoYun:
             http.verify = cert_path
         return
 
+    def reset(self):
+        """
+        重置class
+        :return:
+        """
+        self.filters = []
+        self.params = {}
+        self.view = ""
+
     def table(self, table: str):
         """
         设置当前的worksheet
         :param table: 表名
         :return: 自身
         """
+        self.reset()
         self.worksheetId = table
-        self.filters = []
         if not self.worksheetMap.get(self.worksheetId):
             data = self.exec(self.WORKSHEET_MAP_URL)
             map = {}
@@ -263,3 +272,14 @@ class MingdaoYun:
             return result
         else:
             return result
+
+    def sort(self, sortId: str, isAsc: bool):
+        """
+        设置排序
+        :param sortId:
+        :param isAsc:
+        :return:
+        """
+        self.params["sortId"] = sortId
+        self.params["isAsc"] = isAsc
+        return self
