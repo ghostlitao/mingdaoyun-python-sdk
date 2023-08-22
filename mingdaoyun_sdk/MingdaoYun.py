@@ -89,6 +89,10 @@ class MingdaoYun:
         return self
 
     def exec(self, uri: str):
+        #  如果 api 是官方的，需要改下地址  https://api.mingdao.com/v2/open/worksheet/getFilterRows
+        if 'api.mingdao.com' in self.host:
+            uri = uri.replace('/api/v2/open/', '/v2/open/')
+
         if not (self.appKey and self.sign and self.worksheetId):
             raise Exception('appKey,sign,table is required! ')
         auth_prams = {"appKey": self.appKey, "sign": self.sign, "worksheetId": self.worksheetId}
