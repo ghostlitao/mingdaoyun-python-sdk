@@ -7,7 +7,7 @@ from requests.packages.urllib3.util.retry import Retry
 retry_strategy = Retry(
     total=20,
     status_forcelist=[429, 500, 502, 503, 504],
-    method_whitelist=['HEAD', 'TRACE', 'GET', 'PUT', 'OPTIONS', 'DELETE'],
+    allowed_methods=['HEAD', 'TRACE', 'GET', 'PUT', 'OPTIONS', 'DELETE'],
     backoff_factor=1
 )
 
