@@ -241,6 +241,17 @@ class MingdaoYun:
         self.params["controls"] = data
         return self.exec(self.ADD_URL)
 
+    def batch_add(self, data: list):
+        """
+        新增多条数据,data 格式为：
+        data = [[{'controlId': $controlId,'value':$value},{'controlId': $controlId,'value':$value}],
+                [{'controlId': $controlId,'value':$value},{'controlId': $controlId,'value':$value}]]
+        :param data:
+        :return:
+        """
+        self.params["rows"] = data
+        return self.exec(self.BATCH_ADD_URL)
+
     def delete(self, data: str):
         """
         删除记录，rowid为逗号拼接的字符串
