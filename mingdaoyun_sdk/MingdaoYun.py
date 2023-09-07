@@ -311,7 +311,7 @@ class MingdaoYun:
         self.params["controls"] = controls
         return self.exec(self.EDIT_URL)
 
-    def batch_edit(self, rowids: list, control: dict):
+    def batch_edit(self, rowids: str, control: dict):
         """
         编辑多条数据
         :param rowids:

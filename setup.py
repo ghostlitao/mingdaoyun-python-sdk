@@ -17,7 +17,7 @@ setuptools.setup(
     # 包的分发名称，使用字母、数字、_、-
     name="mingdaoyun_sdk",
     # 版本号, 版本号规范：https://www.python.org/dev/peps/pep-0440/
-    version="0.0.12",
+    version="0.0.13",
     # 作者名
     author="Todd",
     # 作者邮箱
