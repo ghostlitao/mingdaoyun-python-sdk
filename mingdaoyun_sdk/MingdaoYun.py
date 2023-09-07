@@ -30,6 +30,7 @@ class MingdaoYun:
     DELETE_URL = "/api/v2/open/worksheet/deleteRow"
     EDIT_URL = "/api/v2/open/worksheet/editRow"
     BATCH_EDIT_URL = "/api/v2/open/worksheet/editRows"
+    COUNT_URL = "/api/v2/open/worksheet/getFilterRowsTotalNum"
 
     def __init__(self, appKey: str, sign: str, host: str, cert_path: str = None):
         """
@@ -252,13 +253,13 @@ class MingdaoYun:
         self.params["rows"] = data
         return self.exec(self.BATCH_ADD_URL)
 
-    def delete(self, data: str):
+    def delete(self, rowid: str):
         """
-        删除记录，rowid为逗号拼接的字符串
-        :param data:
+        删除记录，rowid 为逗号拼接的字符串
+        :param rowid:
         :return:
         """
-        self.params["rowId"] = data
+        self.params["rowId"] = rowid
         return self.exec(self.DELETE_URL)
 
     def find_relations(self, rowid, controlId, pageSize=1000, pageIndex=1, all=False):
@@ -297,4 +298,69 @@ class MingdaoYun:
         """
         self.params["sortId"] = sortId
         self.params["isAsc"] = isAsc
+        return self
+
+    def edit(self, rowid: str, controls: list):
+        """
+        编辑一条数据
+        :param rowid:
+        :param controls:
+        :return:
+        """
+        self.params["rowId"] = rowid
+        self.params["controls"] = controls
+        return self.exec(self.EDIT_URL)
+
+    def batch_edit(self, rowids: list, control: dict):
+        """
+        编辑多条数据
+        :param rowids:
+        :param control:
+        :return:
+        """
+        self.params["rowIds"] = rowids
+        self.params["control"] = control
+        return self.exec(self.BATCH_EDIT_URL)
+
+    def count(self):
+        """
+        获取数量
+        :return:
+        """
+        return self.exec(self.COUNT_URL)
+
+    def triggerWorkflow(self, value=True):
+        """
+        设置是否触发工作流 , 默认触发
+        :param value:
+        :return:
+        """
+        self.params["triggerWorkflow"] = value
+        return self
+
+    def notGetTotal(self, value=False):
+        """
+        是否不统计总行数以提高性能
+        :param value:
+        :return:
+        """
+        self.params["notGetTotal"] = value
+        return self
+
+    def useControlId(self, value=False):
+        """
+        是否只返回controlId，默认false
+        :param value:
+        :return:
+        """
+        self.params["useControlId"] = value
+        return self
+
+    def getSystemControl(self, value=False):
+        """
+        是否获取系统字段，默认false
+        :param value:
+        :return:
+        """
+        self.params["getSystemControl"] = value
         return self
