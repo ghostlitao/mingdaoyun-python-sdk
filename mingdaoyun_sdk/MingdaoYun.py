@@ -21,6 +21,7 @@ class MingdaoYun:
     params = {}
 
     # URIs
+    APPLICATION_URL = "/api/v1/open/app/get"
     LIST_URL = "/api/v2/open/worksheet/getFilterRows"
     WORKSHEET_MAP_URL = "/api/v2/open/worksheet/getWorksheetInfo"
     GET_BY_ID_URL = "/api/v2/open/worksheet/getRowByIdPost"
@@ -88,6 +89,14 @@ class MingdaoYun:
         """
         self.view = view
         return self
+
+    def applicationInfo(self):
+        """
+        获取应用信息
+        :return:
+        """
+        data = http.get(self.host + self.APPLICATION_URL, params={'appKey': self.appKey, 'sign': self.sign}).json()
+        return data
 
     def exec(self, uri: str):
         #  如果 api 是官方的，需要改下地址  https://api.mingdao.com/v2/open/worksheet/getFilterRows
