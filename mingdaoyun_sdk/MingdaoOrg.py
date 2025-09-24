@@ -8,6 +8,7 @@
 import hashlib
 import base64
 import time
+import math
 
 from mingdaoyun_sdk.common import http
 
@@ -27,6 +28,9 @@ class MingdaoOrg:
     removeStructuresURL = '/api/v2/open/structure/removeStructures'
     # 替换汇报关系成员
     replaceStructureURL = '/api/v2/open/structure/replaceStructure'
+
+    # 获取用户列表
+    getUsersURL = '/generalintegrateapi/v2/user/getUsers'
 
     params = {}
 
@@ -79,7 +83,7 @@ class MingdaoOrg:
             "sign": self.getSignature(self.appKey, self.secretKey, timestamp)
         }
         url = self.host + uri
-        print(self.params)
+
         if self.method == "GET":
             data = http.get(url, params={**auth_param, **self.params}).json()
         else:
@@ -129,3 +133,35 @@ class MingdaoOrg:
         self.params['subordinates'] = newSubordinate
         self.method = "POST"
         return self.exec(self.replaceStructureURL)
+
+    def getUser(self, userStatus: list = None):
+        """
+        获取用户列表
+        :param userStatus:  用户状态，1:正常 2:被拒绝加入 3:待审核 4:离职
+        :return: list[dict]
+        """
+        if userStatus is None or len(userStatus) == 0:
+            userStatus = [1, 2, 3, 4]
+
+        users = []
+        self.params.update({"pageSize": 1000})
+        self.method = "GET"
+
+        def fetch_page(status, pageIndex):
+            self.params.update({"userStatus": status, "pageIndex": pageIndex})
+            data = self.exec(self.getUsersURL)
+            # 给每个用户打标签
+            return [{**u, "userStatus": status} for u in data['data']['users']], data['data']['count']
+
+        for status in userStatus:
+            # 第 1 页
+            page_users, total = fetch_page(status, 1)
+            users.extend(page_users)
+
+            # 后续页
+            total_pages = math.ceil(total / self.params['pageSize'])
+            for pageIndex in range(2, total_pages + 1):
+                page_users, _ = fetch_page(status, pageIndex)
+                users.extend(page_users)
+
+        return users
