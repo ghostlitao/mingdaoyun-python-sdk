@@ -33,12 +33,14 @@ class MingdaoYun:
     BATCH_EDIT_URL = "/api/v2/open/worksheet/editRows"
     COUNT_URL = "/api/v2/open/worksheet/getFilterRowsTotalNum"
 
-    def __init__(self, appKey: str, sign: str, host: str, cert_path: str = None):
-        """
+    def __init__(self, appKey: str, sign: str, host: str, cert_path: str = None,proxy:dict=None):
+        f"""
         初始化mingdaoyun方法
         :param appKey: {string} appKey
         :param sign:{string} sign
         :param host :{string} host
+        :param cert_path: {string} cert_path
+        :param proxy: {dict} proxy {"http":"http://127.0.0.1:7890","https":"http://127.0.0.1:7890"}
         :return:  Mingdaoyun 实体类
         """
         self.appKey = appKey
@@ -50,6 +52,8 @@ class MingdaoYun:
         self.view = ""
         if cert_path is not None:
             http.verify = cert_path
+        if proxy is not None:
+            http.proxies = proxy
         return
 
     def reset(self):
@@ -109,6 +113,11 @@ class MingdaoYun:
         if len(self.view) > 0:
             self.params["viewId"] = self.view
         self.params["filters"] = self.filters
+        if self.proxies is not None:
+            # 判断代理是否正确
+            if "http" not in self.proxies or "https" not in self.proxies:
+                raise Exception("proxy is not valid!")
+            http.proxies = self.proxies
         data = http.post(self.host + uri, json={**self.params, **auth_prams}).json()
         return data
 
