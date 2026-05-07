@@ -5,6 +5,9 @@ mingdaoyun-Python-SDK
 
 如果你在寻找PHP版本的,请点击(https://github.com/Lany-w/mingdaoyun-php-sdk)
 
+# Warning
+0.0.17 版本无法使用，请升级到0.0.18版本或者0.0.16版本
+
 ## Installing
 
 ```shell

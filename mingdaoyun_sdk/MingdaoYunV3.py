@@ -21,7 +21,7 @@ class MingdaoYunV3:
     WORKFLOW_LIST_URL = "/api/v3/app/workflow/processes"
     WORKFLOW_DETAIL_URL = "/api/v3/app/workflow/processes/{process_id}"
 
-    def __init__(self, appKey: str, sign: str, host: str, cert_path: str = None, proxy:dict=None):
+    def __init__(self, appKey: str, sign: str, host: str, cert_path: str = None):
         """
         初始化mingdaoyun方法
         :param appKey: {string} appKey
@@ -43,8 +43,6 @@ class MingdaoYunV3:
         self.filters = []
         self.worksheetId = ""
         self.view = ""
-        if proxy is not None:
-            http.proxies = proxy
         if cert_path is not None:
             http.verify = cert_path
         return
@@ -93,8 +91,6 @@ class MingdaoYunV3:
         :param params: 请求参数
         :return: 请求结果
         """
-        if self.proxies is not None:
-            http.proxies = self.proxies
         if method == 'GET':
             data = http.get(url, headers=self.headerParameters, params=params).json()
         elif method=='POST':

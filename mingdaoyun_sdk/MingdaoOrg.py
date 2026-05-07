@@ -35,7 +35,7 @@ class MingdaoOrg:
     params = {}
 
     # 初始化
-    def __init__(self, appKey: str, secretKey: str, host: str, projectId: str, proxy:dict=None):
+    def __init__(self, appKey: str, secretKey: str, host: str, projectId: str):
         """
         初始化mingdaoyun方法
 
@@ -43,7 +43,6 @@ class MingdaoOrg:
         :param secretKey:{string} secretKey
         :param host :{string} host
         :param projectId :{string} projectId
-        :param proxy: {dict} proxy {"http":"http://127.0.0.1:7890","https":"http://127.0.0.1:7890"}
         :return:  Mingdaoyun 实体类
         """
         self.appKey = appKey
@@ -51,8 +50,6 @@ class MingdaoOrg:
         self.host = host
         self.projectId = projectId
         self.params = {}
-        if proxy is not None:
-            http.proxies = proxy
 
     def getSignature(self, appkey, appsecret, timestamp):
         """
@@ -86,9 +83,6 @@ class MingdaoOrg:
             "sign": self.getSignature(self.appKey, self.secretKey, timestamp)
         }
         url = self.host + uri
-        if self.proxies is not None:
-            http.proxies = self.proxies
-
         if self.method == "GET":
             data = http.get(url, params={**auth_param, **self.params}).json()
         else:
