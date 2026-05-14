@@ -34,7 +34,7 @@ class MingdaoYun:
     COUNT_URL = "/api/v2/open/worksheet/getFilterRowsTotalNum"
 
     def __init__(self, appKey: str, sign: str, host: str, cert_path: str = None):
-        f"""
+        """
         初始化mingdaoyun方法
         :param appKey: {string} appKey
         :param sign:{string} sign
